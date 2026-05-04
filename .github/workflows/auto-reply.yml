@@ -1,0 +1,44 @@
+name: Auto-acknowledge new issues
+
+# Posts a single welcome comment on every new issue. Sets expectations
+# (this is read by a human, response time is reasonable) and reminds
+# the reporter about the crash-log path + the rewards program.
+#
+# Skips bots and issues opened by the maintainer.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  acknowledge:
+    runs-on: ubuntu-latest
+    if: github.event.issue.user.type == 'User' && github.event.issue.user.login != 'arquiteto-raiz'
+    steps:
+      - name: Post welcome comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = [
+              `Hi @${issue.user.login} — thanks for filing this. Vocare is a one-person studio so reading and responding is hands-on. I usually get to issues within a few days.`,
+              ``,
+              `**A few quick things that help me act faster:**`,
+              `- If the app crashed, paste the contents of \`~/.vocare/logs/crash_YYYYMMDD_HHMMSS.log\` (most recent file).`,
+              `- macOS version (Apple menu → About This Mac) and Mac model.`,
+              `- E-reader/source you were using (e.g. *Kobo Libra + KOReader*, *Calibre on macOS*).`,
+              `- Steps that triggered the issue.`,
+              ``,
+              `**Worth knowing:** a reproducible bug we triage and fix counts as an [accepted contribution under the rewards program](https://github.com/MestreShao-Studios/vocare#helping-out) — earns v2.0 free for life when it ships.`,
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              issue_number: issue.number,
+              body,
+            });
+            core.info("Welcome comment posted.");

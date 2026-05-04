@@ -1,0 +1,65 @@
+name: Auto-label new issues
+
+# Adds initial labels based on title/body keywords. Catches issues that
+# bypass the issue templates (web "Open issue" without picking a template,
+# email-to-issue forwarding, mobile app submissions). Templates already
+# set primary labels; this workflow is a fallback.
+#
+# It does NOT close, comment, or modify content — only adds labels.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply labels by keyword
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const text  = `${issue.title}\n${issue.body || ""}`.toLowerCase();
+            const labels = new Set();
+
+            // Always — every new issue starts as needs-triage if templates didn't set it.
+            const existing = (issue.labels || []).map(l => l.name);
+            if (!existing.includes("needs-triage")) labels.add("needs-triage");
+
+            // Bug signals
+            if (/\b(crash|crashed|crashes|error|broke|broken|exception|traceback|stuck|hangs?|fails?|doesn['']t work|not working)\b/.test(text)) {
+              labels.add("bug");
+            }
+
+            // Feature/enhancement signals
+            if (/\b(feature request|suggest|idea|would be (nice|great|cool)|wish|could you add|please add|enhancement|improve|support for)\b/.test(text)) {
+              labels.add("enhancement");
+            }
+
+            // Device-report signals — mentions specific devices not in maintainer's tested set
+            if (/\b(jailbroken|kindle|pocketbook|boox|onyx|kobo (aura|glo|touch|nia|clara|sage|elipsa))\b/.test(text)) {
+              labels.add("device-report");
+            }
+
+            // Documentation-only issue
+            if (/\b(typo|readme|docs|documentation|wording|broken link)\b/.test(text)) {
+              labels.add("documentation");
+            }
+
+            // Apply
+            const toAdd = [...labels].filter(l => !existing.includes(l));
+            if (toAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: issue.number,
+                labels:       toAdd,
+              });
+              core.info(`Added labels: ${toAdd.join(", ")}`);
+            } else {
+              core.info("No new labels to add.");
+            }
