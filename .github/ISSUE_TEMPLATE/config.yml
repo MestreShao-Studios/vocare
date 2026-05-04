@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / discussion
+    url: https://github.com/MestreShao-Studios/vocare/discussions
+    about: Open-ended question about Vocare? Use Discussions instead of Issues.
