@@ -128,6 +128,21 @@ Future versions will let you rate generated images so Vocare learns your visual 
 
 ---
 
+## Deck Doctor *(new in v1.1)*
+
+A small utility for cleaning Vocare-generated cards already sitting in your Anki deck. Open it from **Tools → Deck Doctor…** while Anki is running.
+
+Two tools inside one dialog:
+
+- **Lowercase Backfill.** Walks every card in a deck and lowercases the typed-answer field — *unless* the AI flags the word as a proper noun (a city name, a person's name, a brand). Proper nouns keep their capital, and a one-line note explaining why gets appended to the explanation field. Use this when older cards were captured at sentence-start (Italian and German do this often) and the typing test now penalises you for typing the natural lowercase form.
+- **Cloze Improver.** Walks every cloze card in a deck and asks Claude to propose sharper cloze placement (whole words instead of fragments), cleaner example sentences, and a tighter explanation. You see every proposal before anything is written; nothing happens without your click.
+
+Both tools work against any deck and any note type — you pick from a dropdown populated live from Anki. The lowercase tool has a **Pilot** mode that previews 5 cards before any write-back, so you can sanity-check before running on hundreds.
+
+Why it exists: a year of Vocare output revealed two pain points worth solving as one-shot utilities — capital-letter false-fails on the type test, and Anki's default cloze syntax getting awkward when words split mid-character. v1.1 ships both fixes for any user with the same patterns in their existing decks.
+
+---
+
 ## Privacy
 
 Vocare is **local-first**:
@@ -175,7 +190,11 @@ Yes — see [Helping out](#helping-out) below.
 
 ## Roadmap
 
-**v1.x** — post-launch polish driven by community feedback. Bug fixes, performance work, UX details.
+**v1.0** ✅ shipped — Kobo / KOReader / Calibre highlights → Anki cards with translation, audio, image, in-context example.
+
+**v1.1** ✅ shipped — *Deck Doctor* in-app utilities for cleaning existing cards (lowercase backfill with proper-noun detection; cloze placement / example / explanation improver). Card-build pipeline now classifies proper nouns automatically so new cards get the right casing from the start.
+
+**v1.x** — continuing post-launch polish driven by community feedback. Bug fixes, performance work, UX details.
 
 **v2.0** — Monolingual mode (define a word in its own language for advanced learners), OAuth ("sign in with your account" instead of pasting API keys), session cost counter.
 
