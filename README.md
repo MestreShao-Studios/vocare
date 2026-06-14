@@ -8,7 +8,7 @@ For language learners reading anywhere — a book, a website, a message, a sign.
 
 ---
 
-> **Status: public beta.** Open TestFlight beta on iPhone and iPad.
+> **Status: public beta.** Open TestFlight beta on iPhone (iPad not tested yet).
 > [**Join the beta →**](https://testflight.apple.com/join/pt2ByQ5E)
 
 ---
